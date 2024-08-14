@@ -1,0 +1,5 @@
+@HostAddress = http://*:8080
+
+GET {{HostAddress}}/
+
+###
