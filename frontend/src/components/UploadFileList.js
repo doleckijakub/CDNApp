@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 
-function GetUploadFiles({ uuid }) {
+function UploadFileList({ uuid }) {
     const [uploads, setUploads] = useState([]);
 
     useEffect(() => {
@@ -28,4 +28,4 @@ function GetUploadFiles({ uuid }) {
     );
 }
 
-export default GetUploadFiles;
+export default UploadFileList;

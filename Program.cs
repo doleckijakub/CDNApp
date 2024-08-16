@@ -8,6 +8,7 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Collections.ObjectModel;
+using System.Globalization;
 
 namespace CDNApp
 {
@@ -48,14 +49,14 @@ namespace CDNApp
             }
         }
 
+        public record Upload(string uuid, long fileSize, string lastModified);
+
         public static void Main(string[] args)
         {
             Directory.CreateDirectory(UploadsDirectory);
 
             var builder = WebApplication.CreateBuilder(args);
             var app = builder.Build();
-
-            app.UseRouting();
 
             app.UseStaticFiles(new StaticFileOptions
             {
@@ -64,24 +65,21 @@ namespace CDNApp
                 RequestPath = ""
             });
 
-            app.UseEndpoints(endpoints =>
-            {
-                endpoints.MapPut(UrlUploadPut, HandleFileUpload)
-                    .WithName("UploadPut")
-                    .WithOpenApi();
+            app.MapPut(UrlUploadPut, HandleFileUpload)
+                .WithName("UploadPut")
+                .WithOpenApi();
 
-                endpoints.MapGet(UrlUploadGet, HandleFileDownload)
-                    .WithName("UploadGet")
-                    .WithOpenApi();
+            app.MapGet(UrlUploadGet, HandleFileDownload)
+                .WithName("UploadGet")
+                .WithOpenApi();
 
-                endpoints.MapGet(UrlApiV1AllUploads, HandleApiAll)
-                    .WithName("ApiV1AllUploads")
-                    .WithOpenApi();
+            app.MapGet(UrlApiV1AllUploads, HandleApiAll)
+                .WithName("ApiV1AllUploads")
+                .WithOpenApi();
 
-                endpoints.MapGet(UrlApiV1FilesOf, HandleApiFilesOf)
-                    .WithName("ApiV1FilesOf")
-                    .WithOpenApi();
-            });
+            app.MapGet(UrlApiV1FilesOf, HandleApiFilesOf)
+                .WithName("ApiV1FilesOf")
+                .WithOpenApi();
 
             foreach (string url in ReactEndpoints)
             {
@@ -152,10 +150,16 @@ namespace CDNApp
         {
             var uuids = Directory
                 .GetDirectories(UploadsDirectory)
-                .Select(Path.GetFileName)
-                .ToArray();
+                .Select(dir => 
+                {
+                    var dirInfo = new DirectoryInfo(dir);
+                    var uuid = dirInfo.Name;
+                    var fileSize = dirInfo.EnumerateFiles("*", SearchOption.AllDirectories).Sum(f => f.Length);
+                    var lastModified = dirInfo.LastWriteTime.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture);
 
-            // TODO: More info. Perhaps a map from UUID to date and size??
+                    return new Upload(uuid, fileSize, lastModified);
+                })
+                .ToArray();
 
             return Results.Ok(uuids);
         }

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import GetAllUploads from './components/GetAllUploads';
-import GetUploadFiles from './components/GetUploadFiles';
+import AllUploadsTable from './components/AllUploadsTable';
+import UploadFileList from './components/UploadFileList';
 
 /*
  * It seems like I had to write a "Router" myself, because for some reason, 
@@ -19,10 +19,10 @@ const App = () => {
       const path = window.location.pathname;
       
       if (path === '/') {
-        setComponent(<GetAllUploads />);
+        setComponent(<AllUploadsTable />);
       } else if (path.startsWith('/upload/')) {
         const uuid = path.split('/')[2];
-        setComponent(<GetUploadFiles uuid={uuid} />);
+        setComponent(<UploadFileList uuid={uuid} />);
       } else {
         setComponent(<div>404 Not Found</div>);
       }
