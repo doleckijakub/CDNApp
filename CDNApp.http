@@ -1,5 +1,13 @@
-@HostAddress = http://*:8080
+@HostAddress = http://localhost:8080
 
-GET {{HostAddress}}/
+### Upload a file
+PUT {{HostAddress}}/sample.txt
+Content-Type: text/plain
 
-###
+This is a sample text file content.
+
+### Get the list of files for a specific UUID
+GET {{HostAddress}}/upload/{{uuid}}
+
+### Download a specific file
+GET {{HostAddress}}/{{uuid}}/sample.txt
