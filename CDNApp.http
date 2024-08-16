@@ -6,8 +6,14 @@ Content-Type: text/plain
 
 This is a sample text file content.
 
-### Get the list of files for a specific UUID
-GET {{HostAddress}}/upload/{{uuid}}
-
 ### Download a specific file
 GET {{HostAddress}}/{{uuid}}/sample.txt
+
+### Get the page showing the list of files for a specific upload by UUID
+GET {{HostAddress}}/upload/{{uuid}}
+
+### Get all currently saved upload UUID's
+GET {{HostAddress}}/api/v1/all
+
+### Get filelist of an upload by UUID
+GET {{HostAddress}}/api/v1/filesof/{{uuid}}

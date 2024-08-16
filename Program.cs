@@ -2,23 +2,36 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.StaticFiles;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.FileProviders;
 using System;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using System.Collections.ObjectModel;
 
 namespace CDNApp
 {
     public class Program
     {
-        private const long MaxFileSize = 1L * 1024 * 1024 * 1024;
-        private const string Domain = "http://localhost:8080";
-        private const string UploadsDirectory = "uploads";
+        private static readonly long MaxFileSize = 1L * 1024 * 1024 * 1024;
+        private static readonly string Domain = "http://localhost:8080";
+        private static readonly string UploadsDirectory = "uploads";
 
-        private const string UrlUploadPut = "/{filename}";
-        // private const string UrlUploadPutPrivate = "/private/{filename}"; // TODO
-        private const string UrlUploadGet = "/{uuid}/{filename}";
-        private const string UrlUploadList = "/upload/{uuid}";
+        private static readonly string UrlUploadPut = "/{filename}";
+        // private static readonly string UrlUploadPutPrivate = "/private/{filename}"; // TODO
+        private static readonly string UrlUploadGet = "/{uuid}/{filename}";
+        private static readonly string UrlUploadList = "/upload/{uuid}";
+
+        private static readonly IList<string> ReactEndpoints = new ReadOnlyCollection<string>
+        (new[]
+            {
+                "/",
+                UrlUploadList
+            }
+        );
+
+        private static readonly string UrlApiV1AllUploads = "/api/v1/all";
+        private static readonly string UrlApiV1FilesOf    = "/api/v1/filesof/{uuid}";
 
         public record UploadPutResult(string uuid, string filename)
         {
@@ -42,19 +55,44 @@ namespace CDNApp
             var builder = WebApplication.CreateBuilder(args);
             var app = builder.Build();
 
-            app.MapPut(UrlUploadPut, HandleFileUpload)
-               .WithName("UploadPut")
-               .WithOpenApi();
+            app.UseRouting();
 
-            app.MapGet(UrlUploadList, HandleFileList)
-               .WithName("UploadList")
-               .WithOpenApi();
+            app.UseStaticFiles(new StaticFileOptions
+            {
+                FileProvider = new PhysicalFileProvider(
+                    Path.Combine(Directory.GetCurrentDirectory(), "frontend", "build")),
+                RequestPath = ""
+            });
 
-            app.MapGet(UrlUploadGet, HandleFileDownload)
-               .WithName("UploadGet")
-               .WithOpenApi();
+            app.UseEndpoints(endpoints =>
+            {
+                endpoints.MapPut(UrlUploadPut, HandleFileUpload)
+                    .WithName("UploadPut")
+                    .WithOpenApi();
+
+                endpoints.MapGet(UrlUploadGet, HandleFileDownload)
+                    .WithName("UploadGet")
+                    .WithOpenApi();
+
+                endpoints.MapGet(UrlApiV1AllUploads, HandleApiAll)
+                    .WithName("ApiV1AllUploads")
+                    .WithOpenApi();
+
+                endpoints.MapGet(UrlApiV1FilesOf, HandleApiFilesOf)
+                    .WithName("ApiV1FilesOf")
+                    .WithOpenApi();
+            });
+
+            foreach (string url in ReactEndpoints)
+            {
+                app.MapGet(url, async context =>
+                {
+                    await context.Response.SendFileAsync(Path.Combine(Directory.GetCurrentDirectory(), "frontend", "build", "index.html"));
+                });
+            }
 
             app.Run();
+
         }
 
         private static string GetSavePath(string uuid)
@@ -96,7 +134,33 @@ namespace CDNApp
             return Results.Ok(new UploadPutResult(uuid, filename));
         }
 
-        private static IResult HandleFileList(HttpContext context, string uuid)
+        private static IResult HandleFileDownload(HttpContext context, string uuid, string filename)
+        {
+            var filePath = GetUploadedFilePath(uuid, filename);
+
+            if (!System.IO.File.Exists(filePath))
+            {
+                return Results.NotFound("File not found.");
+            }
+
+            var contentType = GetHttpContentType(filePath);
+
+            return Results.File(filePath, contentType, filename);
+        }
+
+        private static IResult HandleApiAll(HttpContext context)
+        {
+            var uuids = Directory
+                .GetDirectories(UploadsDirectory)
+                .Select(Path.GetFileName)
+                .ToArray();
+
+            // TODO: More info. Perhaps a map from UUID to date and size??
+
+            return Results.Ok(uuids);
+        }
+
+        private static IResult HandleApiFilesOf(HttpContext context, string uuid)
         {
             var uploadPath = GetSavePath(uuid);
 
@@ -111,20 +175,6 @@ namespace CDNApp
                 .ToArray();
 
             return Results.Ok(files);
-        }
-
-        private static IResult HandleFileDownload(HttpContext context, string uuid, string filename)
-        {
-            var filePath = GetUploadedFilePath(uuid, filename);
-
-            if (!System.IO.File.Exists(filePath))
-            {
-                return Results.NotFound("File not found.");
-            }
-
-            var contentType = GetHttpContentType(filePath);
-
-            return Results.File(filePath, contentType, filename);
         }
     }
 }
