@@ -1,5 +1,4 @@
 using Microsoft.AspNetCore.Mvc;
-using CDNApp.Helpers;
 using CDNApp.Models;
 using System.Globalization;
 
@@ -31,7 +30,7 @@ namespace CDNApp.Controllers
         [HttpGet(Config.UrlApiV1FilesOf)]
         public IActionResult HandleApiFilesOf(string uuid)
         {
-            var uploadPath = PathHelper.GetSavePath(uuid);
+            var uploadPath = Config.GetSavePath(uuid);
 
             if (!Directory.Exists(uploadPath))
             {

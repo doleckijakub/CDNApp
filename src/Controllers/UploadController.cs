@@ -16,11 +16,11 @@ namespace CDNApp.Controllers
             }
 
             var uuid = Guid.NewGuid().ToString();
-            var savePath = PathHelper.GetSavePath(uuid);
+            var savePath = Config.GetSavePath(uuid);
 
             Directory.CreateDirectory(savePath);
 
-            var filePath = PathHelper.GetUploadedFilePath(uuid, filename);
+            var filePath = Config.GetUploadedFilePath(uuid, filename);
 
             using (var stream = new FileStream(filePath, FileMode.Create))
             {
@@ -33,14 +33,14 @@ namespace CDNApp.Controllers
         [HttpGet(Config.UrlUploadGet)]
         public IActionResult HandleFileDownload(string uuid, string filename)
         {
-            var filePath = PathHelper.GetUploadedFilePath(uuid, filename);
+            var filePath = Config.GetUploadedFilePath(uuid, filename);
 
             if (!System.IO.File.Exists(filePath))
             {
                 return NotFound("File not found.");
             }
 
-            var contentType = PathHelper.GetHttpContentType(filePath);
+            var contentType = HTTPHelper.GetHttpContentType(filePath);
 
             return File(System.IO.File.OpenRead(filePath), contentType, filename);
         }

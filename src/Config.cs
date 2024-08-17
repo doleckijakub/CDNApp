@@ -27,6 +27,14 @@ namespace CDNApp
             }
         );
 
-        
+        public static string GetSavePath(string uuid)
+        {
+            return Path.GetFullPath(Path.Combine(UploadsDirectory, uuid));
+        }
+
+        public static string GetUploadedFilePath(string uuid, string filename)
+        {
+            return Path.Combine(GetSavePath(uuid), filename);
+        }
     }
 }
