@@ -1,27 +1,26 @@
-/* General table styling */
 table {
   width: 100%;
   border-collapse: collapse;
   margin-bottom: 20px;
-  background-color: #2d2d2d; /* Dark background for the table */
-  color: #f0f0f0; /* Light text color */
+  background-color: #2d2d2d;
+  color: #f0f0f0;
   font-family: Arial, sans-serif;
-  border: 1px solid #444; /* Dark border */
+  border: 1px solid #444;
 }
 
 th {
   cursor: pointer;
-  background-color: #1c1c1c; /* Even darker background for headers */
+  background-color: #1c1c1c;
   padding: 12px 15px;
   position: relative;
   text-align: left;
-  border-bottom: 2px solid #444; /* Bold border for the header */
-  color: #ffcc00; /* Gold color for the headers */
+  border-bottom: 2px solid #444;
+  color: #ffcc00;
   font-weight: bold;
 }
 
 th:hover {
-  background-color: #333; /* Slightly lighter background on hover */
+  background-color: #333;
 }
 
 th span {
@@ -29,11 +28,11 @@ th span {
 }
 
 tr:nth-child(even) {
-  background-color: #3a3a3a; /* Darker background for even rows */
+  background-color: #3a3a3a;
 }
 
 tr:nth-child(odd) {
-  background-color: #2d2d2d; /* Lighter background for odd rows */
+  background-color: #2d2d2d;
 }
 
 td {
@@ -42,22 +41,11 @@ td {
 }
 
 td a {
-  color: #ffcc00; /* Gold color for links */
+  color: #ffcc00;
   text-decoration: none;
 }
 
 td a:hover {
   text-decoration: underline;
-}
-
-/* Sorting Indicators */
-th.ascending span::after {
-  content: ' ▲';
-  font-size: 0.8em;
-}
-
-th.descending span::after {
-  content: ' ▼';
-  font-size: 0.8em;
 }
 

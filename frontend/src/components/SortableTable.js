@@ -1,20 +1,30 @@
-import React, { useState } from 'react';
+import { useState, useMemo, isValidElement } from 'react';
 
 const SortableTable = ({ data }) => {
   const [sortConfig, setSortConfig] = useState({ key: null, direction: 'ascending' });
 
   const headers = data && data.length > 0 ? Object.keys(data[0]) : [];
 
-  const sortedData = React.useMemo(() => {
+  const extractContents = el => {
+    if (el === undefined || el === null) return '';
+    if (typeof el === 'string' || typeof el === 'number') return el;
+    if (isValidElement(el)) return el.props.children || '';
+
+    console.warn("Unexpected data type:", typeof el);
+    
+    return '';
+  };
+
+  const sortedData = useMemo(() => {
     let sortableItems = [...data];
     if (sortConfig !== null) {
       sortableItems.sort((a, b) => {
-        if (a[sortConfig.key] < b[sortConfig.key]) {
-          return sortConfig.direction === 'ascending' ? -1 : 1;
-        }
-        if (a[sortConfig.key] > b[sortConfig.key]) {
-          return sortConfig.direction === 'ascending' ? 1 : -1;
-        }
+        a = extractContents(a[sortConfig.key]);
+        b = extractContents(b[sortConfig.key]);
+
+        if (a < b) return sortConfig.direction === 'ascending' ? -1 : 1;
+        if (a > b) return sortConfig.direction === 'ascending' ? 1 : -1;
+
         return 0;
       });
     }
@@ -41,7 +51,7 @@ const SortableTable = ({ data }) => {
   }
 
   return (
-    <table class="table">
+    <table>
       <thead>
         <tr>
           {headers.map((key) => (
@@ -49,9 +59,13 @@ const SortableTable = ({ data }) => {
               key={key}
               onClick={() => requestSort(key)}
               className={getClassNamesFor(key)}
-              class="table-header"
             >
               {key.charAt(0).toUpperCase() + key.slice(1)}
+              {sortConfig.key === key && (
+                <span>
+                  {sortConfig.direction === 'ascending' ? ' ▲' : ' ▼'}
+                </span>
+              )}
             </th>
           ))}
         </tr>
