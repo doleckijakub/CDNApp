@@ -3,7 +3,6 @@ import React, { useState } from 'react';
 const SortableTable = ({ data }) => {
   const [sortConfig, setSortConfig] = useState({ key: null, direction: 'ascending' });
 
-  // Ensure data is an array and has at least one item before attempting to get headers
   const headers = data && data.length > 0 ? Object.keys(data[0]) : [];
 
   const sortedData = React.useMemo(() => {
@@ -37,13 +36,12 @@ const SortableTable = ({ data }) => {
     return sortConfig.key === key ? sortConfig.direction : undefined;
   };
 
-  // If there are no headers (meaning no data), show a message
   if (headers.length === 0) {
     return <p>No data available to display</p>;
   }
 
   return (
-    <table>
+    <table class="table">
       <thead>
         <tr>
           {headers.map((key) => (
@@ -51,6 +49,7 @@ const SortableTable = ({ data }) => {
               key={key}
               onClick={() => requestSort(key)}
               className={getClassNamesFor(key)}
+              class="table-header"
             >
               {key.charAt(0).toUpperCase() + key.slice(1)}
             </th>

@@ -1,0 +1,63 @@
+/* General table styling */
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 20px;
+  background-color: #2d2d2d; /* Dark background for the table */
+  color: #f0f0f0; /* Light text color */
+  font-family: Arial, sans-serif;
+  border: 1px solid #444; /* Dark border */
+}
+
+th {
+  cursor: pointer;
+  background-color: #1c1c1c; /* Even darker background for headers */
+  padding: 12px 15px;
+  position: relative;
+  text-align: left;
+  border-bottom: 2px solid #444; /* Bold border for the header */
+  color: #ffcc00; /* Gold color for the headers */
+  font-weight: bold;
+}
+
+th:hover {
+  background-color: #333; /* Slightly lighter background on hover */
+}
+
+th span {
+  margin-left: 8px;
+}
+
+tr:nth-child(even) {
+  background-color: #3a3a3a; /* Darker background for even rows */
+}
+
+tr:nth-child(odd) {
+  background-color: #2d2d2d; /* Lighter background for odd rows */
+}
+
+td {
+  padding: 12px 15px;
+  border-bottom: 1px solid #444;
+}
+
+td a {
+  color: #ffcc00; /* Gold color for links */
+  text-decoration: none;
+}
+
+td a:hover {
+  text-decoration: underline;
+}
+
+/* Sorting Indicators */
+th.ascending span::after {
+  content: ' ▲';
+  font-size: 0.8em;
+}
+
+th.descending span::after {
+  content: ' ▼';
+  font-size: 0.8em;
+}
+

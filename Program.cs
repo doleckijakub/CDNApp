@@ -51,6 +51,8 @@ namespace CDNApp
 
         public record Upload(string uuid, long fileSize, string lastModified);
 
+        public record File(string filename, long fileSize);
+
         public static void Main(string[] args)
         {
             Directory.CreateDirectory(UploadsDirectory);
@@ -153,6 +155,7 @@ namespace CDNApp
                 .Select(dir => 
                 {
                     var dirInfo = new DirectoryInfo(dir);
+
                     var uuid = dirInfo.Name;
                     var fileSize = dirInfo.EnumerateFiles("*", SearchOption.AllDirectories).Sum(f => f.Length);
                     var lastModified = dirInfo.LastWriteTime.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture);
@@ -175,7 +178,15 @@ namespace CDNApp
 
             var files = Directory
                 .GetFiles(uploadPath)
-                .Select(Path.GetFileName)
+                .Select(file => 
+                {
+                    var fileInfo = new FileInfo(file);
+
+                    var filename = fileInfo.Name;
+                    var fileSize = fileInfo.Length;
+
+                    return new File(filename, fileSize);
+                })
                 .ToArray();
 
             return Results.Ok(files);

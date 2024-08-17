@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import AllUploadsTable from './components/AllUploadsTable';
 import UploadFileList from './components/UploadFileList';
+import './App.css';
 
 /*
  * It seems like I had to write a "Router" myself, because for some reason, 
