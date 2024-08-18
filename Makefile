@@ -3,6 +3,7 @@ help:
 	@echo "$ make build    -- build the project"
 	@echo "$ make run      -- build and run the project"
 	@echo "$ make frontend -- build the frontend"
+	@echo "$ make entr     -- rebuild and run the app whenever sources change"
 	@echo "$ make clean    -- remove the build files"
 
 CS_SOURCES       := $(shell find src -type f -name '*.cs') # TODO: change for windows
@@ -25,6 +26,10 @@ frontend: frontend/build
 frontend/build: $(FRONTEND_SOURCES)
 	cd frontend && npm run build
 	touch $@
+
+.PHONY: entr
+entr:
+	@ls $(CS_SOURCES) $(FRONTEND_SOURCES) | entr -r -s "make run"
 
 .PHONY: clean
 clean:
