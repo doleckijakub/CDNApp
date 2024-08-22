@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
+import IndexPage from './components/IndexPage';
 import AllUploadsTable from './components/AllUploadsTable';
 import UploadFileList from './components/UploadFileList';
+import 'bootstrap/dist/css/bootstrap.min.css';
 import './App.css';
 
 /*
@@ -20,6 +22,8 @@ const App = () => {
       const path = window.location.pathname;
       
       if (path === '/') {
+        setComponent(<IndexPage />);
+      } else if (path.startsWith('/all')) {
         setComponent(<AllUploadsTable />);
       } else if (path.startsWith('/upload/')) {
         const uuid = path.split('/')[2];
